@@ -1,59 +1,27 @@
-# HDNetApp
+# Login Component
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Reactive Forms are a good fit : Official Signal-based forms ecosystem is still evolving, whereas Reactive Forms are completely production-ready.
 
-## Development server
+## JWT validation
 
-To start a local development server, run:
+The login component receives an access token from the API and stores it for
+subsequent requests. The API must verify the JWT's signature and claims before
+authorizing protected operations. A client may decode claims for display or
+user experience, but decoding does not verify the signature and must not be
+used as proof of authorization. Never put a signing secret in the frontend.
 
-```bash
-ng serve
-```
+# Pending:
+Test cases were not written due to time constraints.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# Questions:
 
-## Code scaffolding
+A. Where should the access token be stored in the browser, and what are the trade-offs?
+ans:​localStorage / sessionStorage: Easy to implement, but vulnerable to XSS if malicious scripts get injected.
+​Best practice today is using In-Memory storage combined with an HttpOnly Refresh Token cookie for session persistence
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+B. The sample app.config.json contains a value named CLIENT_SECRET. Is this a problem, and what should be done about it?
 
-```bash
-ng generate component component-name
-```
+ans: Frontend apps like Angular run in the browser, so configuration values can be viewed using DevTools. Never expose CLIENT_SECRET in frontend code. Use OAuth 2.0 with PKCE for SPAs or a Backend for Frontend (BFF) to securely handle secrets on the server.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+# AI Tool:
+I used GitHub Copilot to troubleshoot and resolve some issues encountered during development.

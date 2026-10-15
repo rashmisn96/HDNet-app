@@ -22,6 +22,7 @@ export class Orders {
 
   displayedColumns = ['orderNumber', 'orderDate', 'status', 'rxCount', 'actions']
   dataSource = signal<Order[]>([]);
+  username = signal(this.getStoredUsername());
   isLoading = signal(false);
   errorMsg = signal<string | null>(null)
   cancellingOrder = signal<string | null>(null);
@@ -112,7 +113,21 @@ export class Orders {
 
   signoutAccount() {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('roles');
+    sessionStorage.removeItem('username');
     this.router.navigate(['/login']);
+  }
+
+  private getStoredUsername(): string {
+    const username = sessionStorage.getItem('username');
+    if (!username) return '';
+
+    try {
+      const parsedUsername: unknown = JSON.parse(username);
+      return typeof parsedUsername === 'string' ? parsedUsername : username;
+    } catch {
+      return username;
+    }
   }
 
  

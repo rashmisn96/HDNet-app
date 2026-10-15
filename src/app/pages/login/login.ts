@@ -50,7 +50,7 @@ export class Login {
 
         sessionStorage.setItem('token', res.accessToken);
         sessionStorage.setItem('roles', JSON.stringify(res.user.roles));
-        sessionStorage.setItem('username', JSON.stringify(res.user.username));
+        sessionStorage.setItem('username', res.user.username);
         this.route.navigateByUrl('/orders');
       },
 

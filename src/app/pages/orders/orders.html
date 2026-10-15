@@ -1,12 +1,12 @@
 
 
  
- <mat-toolbar color="primary">
+ <mat-toolbar>
    
     <span class="spacer">HDnet</span>
 
     <div class="profile">
-      <span>Username</span>
+      <span>{{ username() }}</span>
       <button matButton="filled" (click)="signoutAccount()">Signout</button>
     </div>
 
