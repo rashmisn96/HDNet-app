@@ -22,6 +22,12 @@ export interface OrderResponse {
     totalItems:number
 }
 
+export type CancelReason =
+    | 'CUSTOMER_REQUEST'
+    | 'DUPLICATE_ORDER'
+    | 'ADDRESS_ISSUE'
+    | 'OTHER';
+
 @Service()
 export class OrderService {
     http = inject(HttpClient);
@@ -31,5 +37,9 @@ export class OrderService {
         return this.http.get<OrderResponse>(`${this.baseurl}/orders`,{
             params:{page:pageNum, size:pageSize}
         })
+    }
+
+    cancelOrder(orderNumber: string, reason: CancelReason) {
+        return this.http.post<Order>(`${this.baseurl}/orders/${orderNumber}/cancel`, { reason });
     }
 }

@@ -5,9 +5,12 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DialogComponent } from '../../shared/components/dialog-component/dialog-component';
+import { CancelReason } from '../../core/services/order-service';
 
 @Component({
-  imports: [MatTableModule, MatPaginatorModule, MatToolbarModule, MatButtonModule],
+  imports: [MatTableModule, MatPaginatorModule, MatToolbarModule, MatButtonModule, MatDialogModule],
   selector: 'app-orders',
   styleUrl: './orders.scss',
   templateUrl: './orders.html',
@@ -15,11 +18,13 @@ import { Router } from '@angular/router';
 export class Orders {
   orderservice = inject(OrderService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   displayedColumns = ['orderNumber', 'orderDate', 'status', 'rxCount', 'actions']
   dataSource = signal<Order[]>([]);
   isLoading = signal(false);
   errorMsg = signal<string | null>(null)
+  cancellingOrder = signal<string | null>(null);
 
   //pagination
   pageNumber = signal(0);
@@ -53,7 +58,7 @@ export class Orders {
   }
 
   canCancelOrder(order:Order):boolean{
-     if (!this.cancelOrderFor.includes(order.status)) {
+    if (!this.cancelOrderFor.includes(order.status)) {
       return false;
     }
 
@@ -66,9 +71,37 @@ export class Orders {
 
   }
 
- 
 
 
+  cancelOrder(order: Order): void {
+    const dialogRef = this.dialog.open<DialogComponent, void, CancelReason>(DialogComponent);
+    dialogRef.afterClosed().subscribe((reason) => {
+      if (!reason) return;
+
+      this.cancellingOrder.set(order.orderNumber);
+      this.errorMsg.set(null);
+      this.orderservice.cancelOrder(order.orderNumber, reason).subscribe({
+        next: (updatedOrder) => {
+          this.updateOrder(updatedOrder);
+          this.cancellingOrder.set(null);
+        },
+        error: (err) => {
+          const currentOrder = err.error?.order as Order | undefined;
+          if (currentOrder) this.updateOrder(currentOrder);
+          this.errorMsg.set(err.error?.message ?? 'Unable to cancel the order. Please try again.');
+          this.cancellingOrder.set(null);
+        },
+      });
+    });
+  }
+
+  private updateOrder(updatedOrder: Order): void {
+    this.dataSource.update((orders) =>
+      orders.map((order) =>
+        order.orderNumber === updatedOrder.orderNumber ? updatedOrder : order,
+      ),
+    );
+  }
 
   onPageChange(event:PageEvent):void{
     this.pageNumber.set(event.pageIndex);

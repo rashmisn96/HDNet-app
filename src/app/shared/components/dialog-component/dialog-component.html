@@ -1,1 +1,12 @@
-<p>dialog-component works!</p>
+<h2 mat-dialog-title>Cancel Order</h2>
+<mat-dialog-content>
+    <select [(ngModel)]="reason">
+        @for (cancelReason of cancelReasons; track cancelReason.value) {
+          <option [value]="cancelReason.value">{{ cancelReason.label }}</option>
+        }
+    </select>
+</mat-dialog-content>
+<mat-dialog-actions>
+      <button mat-button mat-dialog-close>Close</button>
+      <button mat-button [mat-dialog-close]="reason">Confirm cancellation</button>
+</mat-dialog-actions>
