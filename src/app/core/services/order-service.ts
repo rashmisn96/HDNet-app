@@ -1,3 +1,6 @@
+// ** @description
+// Handles  API calls and the core business logic for the Orders page
+
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { environment } from '../../../environment';

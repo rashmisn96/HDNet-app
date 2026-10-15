@@ -31,7 +31,7 @@ export class Login {
 
   loginSubmit():void{
 
-    if (this.isSubmitting()) return;
+  
 
     if(this.loginForm.invalid){
       this.loginForm.markAllAsTouched();
