@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,22 +14,50 @@ import { Router } from '@angular/router';
   styleUrl: './login.scss',
   templateUrl: './login.html',
 })
-export class Login {
+export class Login { 
 
   loginError = signal<string | null>(null);
   showPassword = signal(false);
-  private readonly auth = inject(AuthService);
-  private readonly route = inject(Router);
+  auth = inject(AuthService);
+  route = inject(Router);
+  inputType = computed(() => this.showPassword() ? 'text' : 'password');
+
 
   loginForm = new FormGroup({
-    username : new FormControl('',[Validators.required]),
-    password : new FormControl('',[Validators.required])
+    username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    password: new FormControl('', { nonNullable: true, validators: [Validators.required] })
   })
 
 
-  loginSubmit(){
+  loginSubmit():void{
+    if(this.loginForm.invalid){
+      this.loginForm.markAllAsTouched();
+      return;
+    }
 
+    this.loginError.set(null);
+    const { username , password} = this.loginForm.getRawValue();
+
+    this.auth.login(username, password).subscribe({
+      next:(res) =>{
+        if(!res.accessToken){
+          this.loginError.set('Invalid username or password')
+        }
+
+        sessionStorage.setItem('token', res.accessToken);
+        sessionStorage.setItem('roles', JSON.stringify(res.user.roles));
+        sessionStorage.setItem('username', JSON.stringify(res.user.username));
+        this.route.navigateByUrl('/orders');
+      },
+
+      error: (err) => {
+        this.loginError.set(err.error?.message ?? 'Login failed. Please try again.');
+      },
+    })
   }
 
+  togglePassword():void{
+    this.showPassword.update(v=>!v)
+  }
 
 }
