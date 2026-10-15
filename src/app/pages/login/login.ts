@@ -7,7 +7,6 @@ import { AuthService } from '../../core/services/auth-service';
 import { Router } from '@angular/router';
 
 
-
 @Component({
   imports: [ReactiveFormsModule, MatCardModule, MatFormFieldModule, MatInputModule],
   selector: 'app-login',
@@ -18,6 +17,7 @@ export class Login {
 
   loginError = signal<string | null>(null);
   showPassword = signal(false);
+  isSubmitting = signal(false);
   auth = inject(AuthService);
   route = inject(Router);
   inputType = computed(() => this.showPassword() ? 'text' : 'password');
@@ -30,11 +30,15 @@ export class Login {
 
 
   loginSubmit():void{
+
+    if (this.isSubmitting()) return;
+
     if(this.loginForm.invalid){
       this.loginForm.markAllAsTouched();
       return;
     }
 
+    this.isSubmitting.set(true);
     this.loginError.set(null);
     const { username , password} = this.loginForm.getRawValue();
 

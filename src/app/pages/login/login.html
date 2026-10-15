@@ -23,7 +23,7 @@
                 } 
             </mat-form-field>
 
-             <button mat-flat-button type="submit" [disabled]="loginForm.invalid">Submit</button>
+             <button mat-flat-button type="submit" [disabled]="isSubmitting()">Submit</button>
                 @if(loginError()){
                     <p class="login-error" role="alert">{{ loginError() }}</p>
                 }
